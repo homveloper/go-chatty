@@ -1,0 +1,154 @@
+Web Request Flow : {
+    User : {
+        shape : person
+    }
+
+    Web Server : {
+        Router : {
+
+        }
+
+        Handler1 
+        Handler2
+        Handler3
+
+        Router -> Handler1
+        Router -> Handler2
+        Router -> Handler3
+    }
+
+    User -> Web Server : Request
+    Web Server -> User : Response
+}
+
+Web Framework Flow : {
+    User : {
+        shape : person
+    }
+
+    Web Server : {
+        Router : {
+
+        }
+
+        Router -> Middlewares
+
+        Middlewares : {
+            Middleware1
+            Middleware2
+            Middleware3
+    
+            Router -> Middleware1
+            Middleware1 -> Middleware2
+            Middleware2 -> Middleware3
+        }
+
+        Middleware Feature : |md
+            ## Feature
+            - Logging
+            - Error Handling
+            - Static File Serving
+            - Request Body Parsing
+        |
+
+        Middleware Feature -> Middlewares : Support
+
+        Handler1 
+        Handler2
+        Handler3
+
+        Middlewares -> Handler1
+        Middlewares -> Handler2
+        Middlewares -> Handler3
+
+        Render : {
+            JSON
+            HTML
+            XML
+        }
+
+        Handler1 -> Render : Response
+        Handler2 -> Render : Response
+        Handler3 -> Render : Response
+    }
+
+    Context : {
+
+    }
+
+    User -> Context -> Web Server : Request
+    Web Server -> Context -> User : Response
+}
+
+Chatting Server Architecture : {
+    User : {
+        shape : person
+    }
+
+    Chatting Server : {
+        Router : {
+
+        }
+
+        httprouter.shape : text
+        httprouter -> Router
+
+        Auth : {
+
+        }
+
+        gomniauth.shape : text
+        gomniauth -> Auth
+
+        Middleware : {
+
+        }
+
+        Handler : {
+            Handler1
+            Handler2
+            Handler3
+        }
+
+        Renderers : {
+            JSON
+            HTML
+            XML
+        }
+
+        render.shape : text
+        render -> Renderers
+
+        MongoDB : {
+            shape : cylinder
+        }
+
+        Handler <-> MongoDB : CRUD
+
+        mgo.shape : text
+        mgo <-> MongoDB : interface
+
+        Session : {
+        }
+
+        negroni-sessions.shape : text
+        negroni-sessions -> Session
+
+        Router -> Auth
+        Auth -> Middleware
+        Middleware -> Handler
+        Handler -> Renderers
+    }
+
+    Web Client : {
+
+    }
+
+    Web Client <-> Chatting Server.Session : Network I/O
+    Web Client -> Chatting Server.Router : Request
+    Chatting Server.Renderers -> Web Client : Response
+
+
+    negroni.shape : text
+    negroni -> Chatting Server
+}
