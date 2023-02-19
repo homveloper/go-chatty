@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -21,9 +22,22 @@ const (
 	SESSION_PRIVATE_KEY = "simple_chat_private_key"
 )
 
+type DBConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
 func init() {
 	renderer = render.New(render.Options{})
-	mongoSession, _ = mgo.Dial("localhost")
+	value, err := ReadConfig("config/db.json")
+	if err != nil {
+		panic(err)
+	}
+	conf := value.(DBConfig)
+	url := fmt.Sprintf("mondgdb://%s:%s@%s:%d", conf.User, conf.Password, conf.Host, conf.Port)
+	mongoSession, _ = mgo.Dial(url)
 }
 
 func main() {
@@ -50,6 +64,8 @@ func main() {
 
 	router.GET("/rooms", RetrieveRooms)
 	router.POST("/rooms", CreateRoom)
+
+	router.GET("/rooms/:id/messages", retrievMessages)
 
 	// negroni 서버 생성
 	server := negroni.Classic()

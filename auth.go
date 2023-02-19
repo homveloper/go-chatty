@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -19,17 +17,20 @@ const (
 	AUTH_SECURITY_KEY = "auth_security_key"
 )
 
-type config struct {
+type AuthConfig struct {
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	RedirectUrl  string `json:"redirect_url"`
 }
 
 func init() {
-	var conf config
+	value, err := ReadConfig("config/auth.json")
 
-	file, _ := ioutil.ReadFile("consfig/auth.json")
-	_ = json.Unmarshal([]byte(file), &conf)
+	if err != nil {
+		panic(err)
+	}
+
+	conf := value.(AuthConfig)
 
 	gomniauth.SetSecurityKey(AUTH_SECURITY_KEY)
 	gomniauth.WithProviders(
@@ -91,7 +92,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		}
 
 		SetCurrentUser(r, u)
-		http.Redirect(w, r, session.Get(NEXT_PAGE_KEY).(string), http.StatusFound)
+
+		if value := session.Get(NEXT_PAGE_KEY); value == nil {
+			http.Redirect(w, r, "/", http.StatusFound)
+		} else {
+			http.Redirect(w, r, value.(string), http.StatusFound)
+		}
+
 	default:
 		http.Error(w, "Auth "+action+" not supported", http.StatusBadRequest)
 	}

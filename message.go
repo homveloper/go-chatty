@@ -1,9 +1,12 @@
 package main
 
 import (
+	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/globalsign/mgo/bson"
+	"github.com/julienschmidt/httprouter"
 )
 
 const (
@@ -37,4 +40,29 @@ func (m *Message) Create() error {
 	}
 
 	return nil
+}
+
+func retrievMessages(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	session := mongoSession.Copy()
+	defer session.Close()
+
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = MESSAGE_FETCH_SIZE
+	}
+
+	var messages []Message
+
+	err = session.DB("simple_chat").C("messages").
+		Find(bson.M{"room_id": bson.ObjectIdHex(ps.ByName("room_id"))}).
+		Sort("-_id").
+		Limit(limit).
+		All(&messages)
+
+	if err != nil {
+		renderer.JSON(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	renderer.JSON(w, http.StatusOK, messages)
 }
