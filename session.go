@@ -33,7 +33,7 @@ func GetCurrentUser(r *http.Request) *User {
 
 	session := sessions.GetSession(r)
 
-	if session.Get(CURRENT_USER_PUBLIC_KEY) != nil {
+	if session.Get(CURRENT_USER_PUBLIC_KEY) == nil {
 		return nil
 	}
 
