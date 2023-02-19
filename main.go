@@ -31,12 +31,13 @@ type DBConfig struct {
 
 func init() {
 	renderer = render.New(render.Options{})
-	value, err := ReadConfig("config/db.json")
-	if err != nil {
+	var dbConfig DBConfig
+
+	if err := ReadConfig("config/db.json", &dbConfig); err != nil {
 		panic(err)
 	}
-	conf := value.(DBConfig)
-	url := fmt.Sprintf("mondgdb://%s:%s@%s:%d", conf.User, conf.Password, conf.Host, conf.Port)
+
+	url := fmt.Sprintf("mondgdb://%s:%s@%s:%d", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port)
 	mongoSession, _ = mgo.Dial(url)
 }
 

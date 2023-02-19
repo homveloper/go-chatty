@@ -5,18 +5,16 @@ import (
 	"io/ioutil"
 )
 
-func ReadConfig(filename string) (interface{}, error) {
-	var conf interface{}
-
+func ReadConfig(filename string, config interface{}) error {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = json.Unmarshal([]byte(file), &conf)
+	err = json.Unmarshal([]byte(file), &config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return conf, nil
+	return nil
 }

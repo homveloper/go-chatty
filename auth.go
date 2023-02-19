@@ -24,20 +24,17 @@ type AuthConfig struct {
 }
 
 func init() {
-	value, err := ReadConfig("config/auth.json")
-
-	if err != nil {
+	var config AuthConfig
+	if err := ReadConfig("config/auth.json", &config); err != nil {
 		panic(err)
 	}
-
-	conf := value.(AuthConfig)
 
 	gomniauth.SetSecurityKey(AUTH_SECURITY_KEY)
 	gomniauth.WithProviders(
 		google.New(
-			conf.ClientId,
-			conf.ClientSecret,
-			conf.RedirectUrl,
+			config.ClientId,
+			config.ClientSecret,
+			config.RedirectUrl,
 		),
 	)
 }
