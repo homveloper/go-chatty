@@ -28,7 +28,7 @@ type config struct {
 func init() {
 	var conf config
 
-	file, _ := ioutil.ReadFile("auth.json")
+	file, _ := ioutil.ReadFile("consfig/auth.json")
 	_ = json.Unmarshal([]byte(file), &conf)
 
 	gomniauth.SetSecurityKey(AUTH_SECURITY_KEY)
